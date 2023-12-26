@@ -1,0 +1,7 @@
+{
+    "name": "janitor",
+    "license": "MIT",
+    "dependencies": {
+        "@jsdotlua/luau-polyfill": "^1.2.6"
+    }
+}
