@@ -3,6 +3,7 @@
 
 -- This implementation of the Janitor uses a stack-based order when operating with a cleanup handlers.
 
+type Proc = () -> ()
 export type JanitorImpl<Key> = {
     __index: JanitorImpl<Key>,
     __tostring: () -> "Janitor",
@@ -14,7 +15,7 @@ export type JanitorImpl<Key> = {
         key: Key?
     ) -> (),
 
-    addFunction: (self: Janitor<Key>, func: () -> (), key: Key?) -> (),
+    addFunction: (self: Janitor<Key>, func: Proc, key: Key?) -> (),
 
     clean: (self: Janitor<Key>, key: Key) -> (),
 
@@ -26,8 +27,8 @@ export type JanitorImpl<Key> = {
 
     addRace: (
         self: Janitor<Key>,
-        setup: (() -> ()) -> () -> (),
-        onCleanup: () -> (),
+        setup: (winRace: Proc) -> Proc,
+        onCleanup: Proc,
         key: Key?
     ) -> Key,
 
@@ -42,7 +43,6 @@ export type JanitorImpl<Key> = {
 
 export type Janitor<Key> = typeof(setmetatable({} :: {}, {} :: JanitorImpl<Key>))
 
-type Proc = () -> ()
 type JanitorItem = Proc | false
 
 local stack = {} :: {
@@ -80,14 +80,14 @@ local indices = {} :: {
     },
 }
 
-local function pushIndice(self: Janitor<unknown>, key, value)
+local function pushIndice(self: Janitor<unknown>, key: unknown, func: Proc)
     local this = indices[self]
     if not this then
         this = {}
         indices[self] = this
     end
 
-    this[key] = value
+    this[key] = func
 end
 
 local JanitorImpl = {} :: JanitorImpl<any>
