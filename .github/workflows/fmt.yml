@@ -3,14 +3,14 @@ name: Format
 on: [push, pull_request]
 
 jobs:
-    format:
-        name: Stylua
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  format:
+    name: Stylua
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Install
-              run: cargo install stylua
+      - name: Install
+        run: cargo install stylua
 
-            - name: Format
-              run: stylua --check src/ --config-path=.stylua.toml
+      - name: Format
+        run: stylua --check src/ --config-path=.stylua.toml
