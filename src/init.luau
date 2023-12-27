@@ -31,12 +31,13 @@ export type JanitorImpl<Key> = {
         key: Key?
     ) -> Key,
 
-    addConnectionHandler: (
-        self: Janitor<Key>,
-        signal: RBXScriptSignal,
-        handler: (Key) -> (),
-        key: Key?
-    ) -> (RBXScriptConnection, Key),
+    -- TODO: implement
+    -- addConnectionHandler: (
+    --     self: Janitor<Key>,
+    --     signal: RBXScriptSignal,
+    --     handler: (Key) -> (),
+    --     key: Key?
+    -- ) -> (RBXScriptConnection, Key),
 }
 
 export type Janitor<Key> = typeof(setmetatable({} :: {}, {} :: JanitorImpl<Key>))
