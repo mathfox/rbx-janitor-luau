@@ -3,7 +3,10 @@
     "tree": {
         "$className": "DataModel",
         "ReplicatedStorage": {
-            "$path": "src"
+            "$className": "ReplicatedStorage",
+            "Janitor": {
+                "$path": "src"
+            }
         }
     }
 }
