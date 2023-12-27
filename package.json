@@ -2,6 +2,7 @@
     "name": "janitor",
     "license": "MIT",
     "dependencies": {
-        "@jsdotlua/luau-polyfill": "^1.2.6"
+        "@jsdotlua/luau-polyfill": "^1.2.6",
+        "jest-lua": "github:jsdotlua/jest-lua"
     }
 }
