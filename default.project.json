@@ -1,0 +1,10 @@
+{
+    "name": "Janitor",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "$path": "src"
+        }
+    }
+}
