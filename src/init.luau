@@ -276,7 +276,7 @@ end
 			print('"Step" animation Keyframe has been reached!')
 			
 			crouchingJanitor:remove(footstepSoundKey)
-
+            
 			removePreviousFootstepSound()
 		end)
 		
@@ -286,7 +286,7 @@ end
 			warn('"Crouching" state was switched to something else while we were \
 				listening for the next "Step" Keyframe to play')
 			stepConnection:Disconnect()
-
+            
 			removePreviousFootstepSound()
 		end, footstepSoundKey)
 	end), "Disconnect")
@@ -345,26 +345,14 @@ end
 	
 	
 ]]
+-- TODO: implement the connections race method
 
-function JanitorImpl:addConnectionHandler(signal, handler, key)
-    if not key then
-        key = {}
-    end
-
-    signal(signal, handler(key))
-
-    --self:addFunction(function()
-    --	connection:Disconnect()
-
-    --	removePreviousFootstepSound()
-    --end, handlerKey)
-end
 
 function JanitorImpl:destroy()
     self:cleanup()
 
     -- Ensure no further method calls can be done
-    setmetatable(self, nil)
+    setmetatable((self :: any) :: {}, nil)
 end
 
 local JanitorLib = {}
