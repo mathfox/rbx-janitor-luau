@@ -16,6 +16,7 @@ export type JanitorImpl<Key> = {
     ) -> (),
 
     addFunction: (self: Janitor<Key>, func: Proc, key: Key?) -> (),
+    addFn: (self: Janitor<Key>, func: Proc, key: Key?) -> (),
 
     clean: (self: Janitor<Key>, key: Key) -> (),
 
@@ -136,6 +137,9 @@ function JanitorImpl:addFunction(func, key)
         pushStackNoReturn(self, func)
     end
 end
+
+-- Alis for "addFunction"
+JanitorImpl.addFn = JanitorImpl.addFunction
 
 -- Cleans a specific task, also replaces the JanitorItem in-place in a stack from a function to a value 'false'.
 function JanitorImpl:clean(key)
