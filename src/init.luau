@@ -4,7 +4,10 @@
 -- This implementation of the Janitor uses a stack-based order when operating with a cleanup handlers.
 
 type Proc = () -> ()
-export type JanitorImpl<Key, Object = { [Key]: (Object) -> () }> = {
+export type JanitorImpl<
+    Key,
+    Object = { [Key]: (Object) -> (), [unknown]: unknown }
+> = {
     __index: JanitorImpl<Key>,
     __tostring: () -> "Janitor",
 
