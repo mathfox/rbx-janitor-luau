@@ -1,6 +1,6 @@
 {
     "name": "@mathfox/rbx-janitor-luau",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Stack-based implementation of the Janitor library written in Luau language.",
     "main": "src/init.luau",
     "scripts": {
