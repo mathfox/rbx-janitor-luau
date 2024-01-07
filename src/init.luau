@@ -3,34 +3,33 @@
 
 -- This implementation of the Janitor uses a stack-based order when operating with a cleanup handlers.
 
+type JanitorObject = Instance | RBXScriptConnection | { [unknown]: unknown }
+
 type Proc = () -> ()
-export type JanitorImpl<
-    Key,
-    Object = { [Key]: (Object) -> (), [unknown]: unknown }
-> = {
-    __index: JanitorImpl<Key>,
+export type JanitorImpl<Key, Object = JanitorObject> = {
+    __index: JanitorImpl<Key, Object>,
     __tostring: () -> "Janitor",
 
     add: (
-        self: Janitor<Key>,
+        self: Janitor<Key, Object>,
         object: Object,
         methodName: string,
         key: Key?
     ) -> (),
 
-    addFunction: (self: Janitor<Key>, func: Proc, key: Key?) -> (),
-    addFn: (self: Janitor<Key>, func: Proc, key: Key?) -> (),
+    addFunction: (self: Janitor<Key, Object>, func: Proc, key: Key?) -> (),
+    addFn: (self: Janitor<Key, Object>, func: Proc, key: Key?) -> (),
 
-    clean: (self: Janitor<Key>, key: Key) -> (),
+    clean: (self: Janitor<Key, Object>, key: Key) -> (),
 
-    remove: (self: Janitor<Key>, key: Key) -> (),
+    remove: (self: Janitor<Key, Object>, key: Key) -> (),
 
-    cleanup: (self: Janitor<Key>) -> (),
+    cleanup: (self: Janitor<Key, Object>) -> (),
 
-    destroy: (self: Janitor<Key>) -> (),
+    destroy: (self: Janitor<Key, Object>) -> (),
 
     addRace: (
-        self: Janitor<Key>,
+        self: Janitor<Key, Object>,
         setup: (winRace: Proc) -> Proc,
         onCleanup: Proc,
         key: Key?
@@ -45,15 +44,20 @@ export type JanitorImpl<
     -- ) -> (RBXScriptConnection, Key),
 }
 
-export type Janitor<Key> = typeof(setmetatable({} :: {}, {} :: JanitorImpl<Key>))
+export type Janitor<Key, Object> = typeof(setmetatable(
+    {} :: {},
+    {} :: JanitorImpl<Key, Object>
+))
+
+export type UnknownJanitor = Janitor<unknown, unknown>
 
 type JanitorItem = Proc | false
 
 local stack = {} :: {
-    [Janitor<unknown>]: { JanitorItem },
+    [UnknownJanitor]: { JanitorItem },
 }
 
-local function pushStack(self: Janitor<unknown>, func: Proc): number
+local function pushStack(self: UnknownJanitor, func: Proc): number
     local this = stack[self]
     if not this then
         this = {}
@@ -68,7 +72,7 @@ end
 
 -- Basically utilizes the "table.insert" function to increase the speed in cases when
 -- there is no need to know about the index at which the cleanup function was insterted.
-local function pushStackNoReturn(self: Janitor<unknown>, func: Proc)
+local function pushStackNoReturn(self: UnknownJanitor, func: Proc)
     local this = stack[self]
     if not this then
         this = {}
@@ -79,12 +83,12 @@ local function pushStackNoReturn(self: Janitor<unknown>, func: Proc)
 end
 
 local indices = {} :: {
-    [Janitor<unknown>]: {
+    [UnknownJanitor]: {
         [unknown]: Proc,
     },
 }
 
-local function pushIndice(self: Janitor<unknown>, key: unknown, func: Proc)
+local function pushIndice(self: UnknownJanitor, key: unknown, func: Proc)
     local this = indices[self]
     if not this then
         this = {}
@@ -94,7 +98,7 @@ local function pushIndice(self: Janitor<unknown>, key: unknown, func: Proc)
     this[key] = func
 end
 
-local JanitorImpl = {} :: JanitorImpl<any>
+local JanitorImpl = {} :: JanitorImpl<unknown, unknown>
 JanitorImpl.__index = JanitorImpl
 
 function JanitorImpl.__tostring()
@@ -125,7 +129,9 @@ local funcToIndexMap: { [Proc]: number } = {}
 
 function JanitorImpl:add(object, methodName, key)
     self:addFunction(function()
-        object[methodName](object)
+        local indexableByKey = object :: any
+
+        indexableByKey[methodName](object)
     end, key)
 end
 
@@ -398,10 +404,12 @@ function JanitorLib.is(value)
     return type(value) == "table" and getmetatable(value) == JanitorImpl
 end
 
-function JanitorLib.new<Key>(): Janitor<Key>
-    local self = setmetatable({}, JanitorImpl)
+function JanitorLib.new()
+    local self: UnknownJanitor = setmetatable({}, JanitorImpl)
 
     return self
 end
+
+table.freeze(JanitorLib)
 
 return JanitorLib
